@@ -29,14 +29,27 @@ public class EmployeeAppService : ApplicationService, IEmployeeAppService
     [Authorize(CyberjuicePermissions.Employees.Default)]
     public async Task<EmployeeDto> GetAsync(Guid id)
     {
-        var employee = await _employeeRepository.GetAsync(id, includeDetails: true);
-        var employeeDto = ObjectMapper.Map<Employee, EmployeeDto>(employee);
+        var employeeQueryable = (await _employeeRepository.GetQueryableAsync()).AsNoTracking();
 
-        // Get company IDs from navigation property
-        employeeDto.CompanyIds = employee.Companies.Select(ce => ce.Id).ToList();
+        var employeeDto = await employeeQueryable
+            .Where(e => e.Id == id)
+            .Select(e => new EmployeeDto
+            {
+                Id = e.Id,
+                FirstName = e.FirstName,
+                LastName = e.LastName,
+                Email = e.Email,
+                PhoneNumber = e.PhoneNumber,
+                DateOfBirth = e.DateOfBirth,
+                JoiningDate = e.JoiningDate,
+                TotalLeaveDays = e.TotalLeaveDays,
+                RemainingLeaveDays = e.RemainingLeaveDays,
+                CompanyIds = e.Companies.Select(c => c.Id).ToList()
+            }).SingleOrDefaultAsync();
 
         return employeeDto;
     }
+
 
     [Authorize(CyberjuicePermissions.Employees.Default)]
     public async Task<List<EmployeeDto>> GetListAsync()
@@ -93,7 +106,7 @@ public class EmployeeAppService : ApplicationService, IEmployeeAppService
     }
 
     [Authorize(CyberjuicePermissions.Employees.Create)]
-    public async Task<EmployeeDto> CreateAsync(CreateUpdateEmployeeInput input)
+    public async Task<bool> CreateAsync(CreateUpdateEmployeeInput input)
     {
         var employee = await _employeeManager.CreateAsync(
             input.FirstName,
@@ -106,18 +119,17 @@ public class EmployeeAppService : ApplicationService, IEmployeeAppService
             input.CompanyIds
         );
 
-        var createdEmployee = await _employeeRepository.InsertAsync(employee, autoSave: true);
-
-        var employeeDto = ObjectMapper.Map<Employee, EmployeeDto>(createdEmployee);
-        employeeDto.CompanyIds = input.CompanyIds.ToList();
-
-        return employeeDto;
+        await _employeeRepository.InsertAsync(employee, autoSave: true);
+         
+        return true;
     }
 
     [Authorize(CyberjuicePermissions.Employees.Edit)]
-    public async Task<EmployeeDto> UpdateAsync(Guid id, CreateUpdateEmployeeInput input)
+    public async Task<bool> UpdateAsync(Guid id, CreateUpdateEmployeeInput input)
     {
-        var employee = await _employeeRepository.GetAsync(id, includeDetails: true);
+        var employee = await (await _employeeRepository.GetQueryableAsync())
+                            .Include(e => e.Companies)
+                            .SingleOrDefaultAsync(e => e.Id == id);
 
         await _employeeManager.UpdateAsync(
             employee,
@@ -131,12 +143,7 @@ public class EmployeeAppService : ApplicationService, IEmployeeAppService
             input.CompanyIds
         );
 
-        var updatedEmployee = await _employeeRepository.UpdateAsync(employee, autoSave: true);
-
-        var employeeDto = ObjectMapper.Map<Employee, EmployeeDto>(updatedEmployee);
-        employeeDto.CompanyIds = input.CompanyIds.ToList();
-
-        return employeeDto;
+        return true;
     }
 
     [Authorize(CyberjuicePermissions.Employees.Delete)]
