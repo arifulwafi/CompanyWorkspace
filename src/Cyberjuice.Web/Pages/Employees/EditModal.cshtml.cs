@@ -64,10 +64,10 @@ public class EditModalModel : AbpPageModel
     {
         var companies = await _companyAppService.GetAllAsync(new PagedAndSortedResultRequestDto { MaxResultCount = 1000 });
         
-        Companies = companies.Items.Select(c => new SelectListItem
+        Companies = [.. companies.Items.Select(c => new SelectListItem
         {
             Value = c.Id.ToString(),
             Text = c.Name
-        }).ToList();
+        })];
     }
 } 

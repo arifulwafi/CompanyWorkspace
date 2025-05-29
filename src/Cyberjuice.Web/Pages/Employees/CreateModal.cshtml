@@ -37,10 +37,10 @@
             {
                 <div class="form-group">
                     <label>@L["Companies"]</label>
-                    <div class="checkbox-list">
+                    <div class="d-flex flex-nowrap overflow-auto">
                         @for (int i = 0; i < Model.Companies.Count; i++)
                         {
-                            <div class="form-check">
+                            <div class="form-check form-check-inline me-3">
                                 <input type="checkbox"
                                        name="Employee.CompanyIds"
                                        value="@Model.Companies[i].Value"
