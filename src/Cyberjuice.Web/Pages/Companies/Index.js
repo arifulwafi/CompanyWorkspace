@@ -1,7 +1,7 @@
 $(function () {
     var l = abp.localization.getResource('Cyberjuice');
-    var createModal = new abp.ModalManager(abp.appPath + 'WorkSpaces/CreateModal');
-    var editModal = new abp.ModalManager(abp.appPath + 'WorkSpaces/EditModal');
+    var createModal = new abp.ModalManager(abp.appPath + 'Companies/CreateModal');
+    var editModal = new abp.ModalManager(abp.appPath + 'Companies/EditModal');
 
     var dataTable = $('#CompaniesTable').DataTable(
         abp.libs.datatables.normalizeConfiguration({
