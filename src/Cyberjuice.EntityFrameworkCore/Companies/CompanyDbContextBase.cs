@@ -80,40 +80,36 @@ where TSelf : DbContext
     {
         var baseFilter = base.CreateFilterExpression<TEntity>(modelBuilder);
 
-        // If the entity is not company-scoped, return the base filter as-is.
         if (!typeof(ICompany).IsAssignableFrom(typeof(TEntity)))
         {
             return baseFilter;
         }
 
-        // Determine the property name used for CompanyId in the EF model.
         var companyIdProperty = modelBuilder
             .Entity<TEntity>()
             .Metadata
             .FindProperty(nameof(ICompany.CompanyId));
 
-        // Return no data if CurrentUserId is not available in CurrentCompany.Employees
-        if (IsMultiCompanyFilterEnabled && !CurrentCompany.HasAccessToCurrentCompany)
-        {
-            return _ => false;
-        }
-
         if (companyIdProperty is null)
         {
-            throw new InvalidOperationException($"Entity '{typeof(TEntity).Name}' implements ICompany but does not define a '{nameof(ICompany.CompanyId)}' property.");
+            throw new InvalidOperationException(
+                $"Entity '{typeof(TEntity).Name}' implements ICompany but does not define a '{nameof(ICompany.CompanyId)}' property.");
         }
 
         var companyIdColumnName = companyIdProperty.GetColumnName() ?? companyIdProperty.Name;
 
-        // Build the company-level filter expression.
+        // The dynamic per-request logic goes inside the expression tree
         Expression<Func<TEntity, bool>> companyFilter = entity =>
             !IsMultiCompanyFilterEnabled
             || CurrentCompany.Id == null
-            || EF.Property<Guid?>(entity, companyIdColumnName) == CurrentCompany.Id;
+            || (
+                EF.Property<Guid?>(entity, companyIdColumnName) == CurrentCompany.Id
+                && CurrentCompany.HasAccessToCurrentCompany // evaluated per-request
+            );
 
-        // Combine with base filter if it exists.
         return baseFilter is null
             ? companyFilter
             : QueryFilterExpressionHelper.CombineExpressions(baseFilter, companyFilter);
     }
+
 }
