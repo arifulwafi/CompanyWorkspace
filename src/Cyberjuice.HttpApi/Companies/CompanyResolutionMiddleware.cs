@@ -35,8 +35,8 @@ public class CompanyResolutionMiddleWare(
         if (companyResolveContext.CompanyId.HasValue)
         {
             // Set current Company using scoped ICurrentWorkspace service
-            bool hasAccessTOCompany = await employeeAppService.GetEmployeeHasAccessToCompanyAsync(currentCompany.Id);
-            using (currentCompany.Change(hasAccessTOCompany, companyResolveContext.CompanyId.Value, companyResolveContext.CompanyName))
+            bool hasAccessToCompany = await employeeAppService.GetEmployeeHasAccessToCompanyAsync(companyResolveContext.CompanyId);
+            using (currentCompany.Change(hasAccessToCompany, companyResolveContext.CompanyId.Value, companyResolveContext.CompanyName))
             {
                 await next(context);
             }
