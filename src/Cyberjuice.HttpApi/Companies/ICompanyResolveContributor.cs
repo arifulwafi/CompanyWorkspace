@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-namespace Cyberjuice.Companies
+namespace Cyberjuice.Companies;
+
+public interface ICompanyResolveContributor
 {
-    public interface ICompanyResolveContributor
-    {
-        string Name { get; }
-        Task ResolveAsync(ICompanyResolveContext context);
-    }
+    string Name { get; }
+    Task ResolveAsync(ICompanyResolveContext context);
 }

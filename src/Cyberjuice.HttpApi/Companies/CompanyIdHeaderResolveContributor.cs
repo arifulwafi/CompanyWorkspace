@@ -13,7 +13,7 @@ public class CompanyIdHeaderResolveContributor : ICompanyResolveContributor, ITr
     /// <summary>
     /// Default header name: X-Company-ID.
     /// </summary>
-    public const string HeaderName = "X-Company-Id";
+    public const string HeaderName = "x-company-id";
 
     /// <summary>
     /// Default contributor name: CompanyIdHeader.
@@ -28,6 +28,7 @@ public class CompanyIdHeaderResolveContributor : ICompanyResolveContributor, ITr
     {
         _logger = logger;
     }
+
     /// <summary>
     /// Tries to resolve current Company from HTTP header.
     /// </summary>

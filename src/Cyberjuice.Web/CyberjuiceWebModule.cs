@@ -298,15 +298,10 @@ public class CyberjuiceWebModule : AbpModule
         app.MapAbpStaticAssets();
         app.UseAbpStudioLink();
         app.UseRouting();
-        app.UseMiddleware<CompanyResolutionMiddleware>();
+        app.UseMiddleware<CompanyResolutionMiddleWare>();
         app.UseAbpSecurityHeaders();
         app.UseAuthentication();
         app.UseAbpOpenIddictValidation();
-
-        if (MultiTenancyConsts.IsEnabled)
-        {
-            app.UseMultiTenancy();
-        }
 
         app.UseUnitOfWork();
         app.UseDynamicClaims();
