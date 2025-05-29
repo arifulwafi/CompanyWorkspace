@@ -10,51 +10,44 @@ using Volo.Abp.Domain.Repositories;
 
 namespace Cyberjuice.Departments;
 
-public class DepartmentAppService : ApplicationService, IDepartmentAppService
+public class DepartmentAppService(
+    IRepository<Department, Guid> departmentRepository,
+    DepartmentManager departmentManager) 
+    : ApplicationService, IDepartmentAppService
 {
-    private readonly IRepository<Department, Guid> _departmentRepository;
-    private readonly DepartmentManager _departmentManager;
-
-    public DepartmentAppService(
-        IRepository<Department, Guid> departmentRepository,
-        DepartmentManager departmentManager)
-    {
-        _departmentRepository = departmentRepository;
-        _departmentManager = departmentManager;
-    }
 
     public async Task<DepartmentDto> CreateAsync(CreateDepartmentDto input)
     {
-        var department = await _departmentManager.CreateAsync(
+        var department = await departmentManager.CreateAsync(
             input.Name,
             input.Description,
             input.EmployeeCount
         );
 
-        var createdDepartment = await _departmentRepository.InsertAsync(department);
+        var createdDepartment = await departmentRepository.InsertAsync(department);
 
         return ObjectMapper.Map<Department, DepartmentDto>(createdDepartment);
     }
 
     public async Task<DepartmentDto> UpdateAsync(Guid id, UpdateDepartmentDto input)
     {
-        var department = await _departmentRepository.GetAsync(id);
+        var department = await departmentRepository.GetAsync(id);
 
-        await _departmentManager.UpdateAsync(
+        await departmentManager.UpdateAsync(
             department,
             input.Name,
             input.Description,
             input.EmployeeCount
         );
 
-        var updatedDepartment = await _departmentRepository.UpdateAsync(department);
+        var updatedDepartment = await departmentRepository.UpdateAsync(department);
 
         return ObjectMapper.Map<Department, DepartmentDto>(updatedDepartment);
     }
 
     public async Task<DepartmentDto> GetAsync(Guid id)
     {
-        var department = await _departmentRepository.GetAsync(id);
+        var department = await departmentRepository.GetAsync(id);
         return ObjectMapper.Map<Department, DepartmentDto>(department);
     }
 
@@ -62,7 +55,7 @@ public class DepartmentAppService : ApplicationService, IDepartmentAppService
     {
         string sortBy = !string.IsNullOrWhiteSpace(input.Sorting) ? input.Sorting : nameof(Department.CreationTime);
 
-        var queryable = (await _departmentRepository.GetQueryableAsync()).AsNoTracking();
+        var queryable = (await departmentRepository.GetQueryableAsync()).AsNoTracking();
 
         var totalCount = await queryable.CountAsync();
 
@@ -92,6 +85,6 @@ public class DepartmentAppService : ApplicationService, IDepartmentAppService
 
     public async Task DeleteAsync(Guid id)
     {
-        await _departmentRepository.DeleteAsync(id);
+        await departmentRepository.DeleteAsync(id);
     }
 }

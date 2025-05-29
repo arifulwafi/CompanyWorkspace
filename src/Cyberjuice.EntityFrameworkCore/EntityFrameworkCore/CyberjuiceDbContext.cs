@@ -1,4 +1,5 @@
 using Cyberjuice.Companies;
+using Cyberjuice.Departments;
 using Cyberjuice.Employees;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
@@ -51,6 +52,7 @@ public class CyberjuiceDbContext :
 
     public DbSet<Company> Companies { get; set; }
     public DbSet<Employee> Employees { get; set; }
+    public DbSet<Department> Departments { get; set; }
 
 
     public CyberjuiceDbContext(DbContextOptions<CyberjuiceDbContext> options)
@@ -84,6 +86,12 @@ public class CyberjuiceDbContext :
         builder.Entity<Employee>(b =>
         {
             b.ToTable(CyberjuiceDbProperties.DbTablePrefix + "Employees", CyberjuiceDbProperties.DbSchema);
+            b.ConfigureByConvention();
+        });
+
+        builder.Entity<Department>(b =>
+        {
+            b.ToTable(CyberjuiceDbProperties.DbTablePrefix + "Departments", CyberjuiceDbProperties.DbSchema);
             b.ConfigureByConvention();
         });
 

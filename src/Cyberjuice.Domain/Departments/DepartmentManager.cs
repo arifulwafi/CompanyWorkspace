@@ -7,7 +7,7 @@ using Volo.Abp;
 namespace Cyberjuice.Departments;
 
 public class DepartmentManager(IRepository<Department, Guid> departmentRepository) 
-    : DomainService
+    : DomainService, IDepartmentManager
 {
     public async Task<Department> CreateAsync(
         string name,

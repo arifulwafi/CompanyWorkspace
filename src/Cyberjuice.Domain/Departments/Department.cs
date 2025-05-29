@@ -1,11 +1,7 @@
 ﻿using Cyberjuice.Companies;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp;
+using Volo.Abp.Domain.Entities.Auditing;
 
 namespace Cyberjuice.Departments;
 
@@ -16,10 +12,7 @@ public class Department : FullAuditedAggregateRoot<Guid>, ICompany
     public string Description { get; set; } = string.Empty;
     public int EmployeeCount { get; private set; }
 
-    protected Department()
-    {
-        // Required by EF Core
-    }
+    protected Department() { } // Required by EF Core
 
     public Department(
         Guid id,
