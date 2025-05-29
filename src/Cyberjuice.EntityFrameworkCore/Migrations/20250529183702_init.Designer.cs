@@ -13,8 +13,8 @@ using Volo.Abp.EntityFrameworkCore;
 namespace Cyberjuice.Migrations
 {
     [DbContext(typeof(CyberjuiceDbContext))]
-    [Migration("20250529124252_Added_Department")]
-    partial class Added_Department
+    [Migration("20250529183702_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -47,9 +47,6 @@ namespace Cyberjuice.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("CreatorId");
 
-                    b.Property<Guid?>("EmployeeId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("ExtraProperties")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
@@ -68,8 +65,6 @@ namespace Cyberjuice.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
 
                     b.ToTable("CyberjuiceCompanies", (string)null);
                 });
@@ -138,6 +133,21 @@ namespace Cyberjuice.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CyberjuiceDepartments", (string)null);
+                });
+
+            modelBuilder.Entity("Cyberjuice.Employees.CompanyEmployee", b =>
+                {
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("CompanyId", "EmployeeId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("CompanyEmployee");
                 });
 
             modelBuilder.Entity("Cyberjuice.Employees.Employee", b =>
@@ -1957,11 +1967,19 @@ namespace Cyberjuice.Migrations
                     b.ToTable("AbpSettingDefinitions", (string)null);
                 });
 
-            modelBuilder.Entity("Cyberjuice.Companies.Company", b =>
+            modelBuilder.Entity("Cyberjuice.Employees.CompanyEmployee", b =>
                 {
+                    b.HasOne("Cyberjuice.Companies.Company", null)
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Cyberjuice.Employees.Employee", null)
-                        .WithMany("Companies")
-                        .HasForeignKey("EmployeeId");
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLogAction", b =>
@@ -2104,11 +2122,6 @@ namespace Cyberjuice.Migrations
                     b.HasOne("Volo.Abp.OpenIddict.Authorizations.OpenIddictAuthorization", null)
                         .WithMany()
                         .HasForeignKey("AuthorizationId");
-                });
-
-            modelBuilder.Entity("Cyberjuice.Employees.Employee", b =>
-                {
-                    b.Navigation("Companies");
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLog", b =>

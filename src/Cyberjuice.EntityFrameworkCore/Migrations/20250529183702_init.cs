@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Cyberjuice.Migrations
 {
     /// <inheritdoc />
-    public partial class Added_Department : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -407,6 +407,24 @@ namespace Cyberjuice.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CyberjuiceCompanies",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ExtraProperties = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastModifierId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CyberjuiceCompanies", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CyberjuiceDepartments",
                 columns: table => new
                 {
@@ -758,27 +776,27 @@ namespace Cyberjuice.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CyberjuiceCompanies",
+                name: "CompanyEmployee",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    EmployeeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ExtraProperties = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false),
-                    CreationTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    LastModificationTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    LastModifierId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    EmployeeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CyberjuiceCompanies", x => x.Id);
+                    table.PrimaryKey("PK_CompanyEmployee", x => new { x.CompanyId, x.EmployeeId });
                     table.ForeignKey(
-                        name: "FK_CyberjuiceCompanies_CyberjuiceEmployees_EmployeeId",
+                        name: "FK_CompanyEmployee_CyberjuiceCompanies_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "CyberjuiceCompanies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CompanyEmployee_CyberjuiceEmployees_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "CyberjuiceEmployees",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -1087,8 +1105,8 @@ namespace Cyberjuice.Migrations
                 column: "UserName");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CyberjuiceCompanies_EmployeeId",
-                table: "CyberjuiceCompanies",
+                name: "IX_CompanyEmployee_EmployeeId",
+                table: "CompanyEmployee",
                 column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
@@ -1198,7 +1216,7 @@ namespace Cyberjuice.Migrations
                 name: "AbpUserTokens");
 
             migrationBuilder.DropTable(
-                name: "CyberjuiceCompanies");
+                name: "CompanyEmployee");
 
             migrationBuilder.DropTable(
                 name: "CyberjuiceDepartments");
@@ -1223,6 +1241,9 @@ namespace Cyberjuice.Migrations
 
             migrationBuilder.DropTable(
                 name: "AbpUsers");
+
+            migrationBuilder.DropTable(
+                name: "CyberjuiceCompanies");
 
             migrationBuilder.DropTable(
                 name: "CyberjuiceEmployees");

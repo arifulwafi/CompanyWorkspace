@@ -86,6 +86,7 @@ public class CyberjuiceDbContext :
         builder.Entity<Employee>(b =>
         {
             b.ToTable(CyberjuiceDbProperties.DbTablePrefix + "Employees", CyberjuiceDbProperties.DbSchema);
+            b.HasMany(e => e.Companies).WithMany().UsingEntity<CompanyEmployee>();
             b.ConfigureByConvention();
         });
 
