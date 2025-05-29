@@ -9,29 +9,29 @@ namespace Cyberjuice.Companies;
 public class CompanyResolutionMiddleware(
     IOptions<CompanyResolveOptions> options,
     ILogger<CompanyResolutionMiddleware> logger,
-    ICurrentCompany currentWorkspace) 
+    ICurrentCompany currentCompany) 
     : IMiddleware, ITransientDependency
 {
     private readonly CompanyResolveOptions _options = options.Value;
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        var workspaceResolveContext = new WorkspaceResolveContext(context);
+        var companyResolveContext = new CompanyResolveContext(context);
 
-        foreach (var workspaceResolver in _options.WorkspaceResolvers)
+        foreach (var companyResolver in _options.CompanyResolvers)
         {
-            await workspaceResolver.ResolveAsync(workspaceResolveContext);
+            await companyResolver.ResolveAsync(companyResolveContext);
 
-            if (workspaceResolveContext.WorkspaceId.HasValue)
+            if (companyResolveContext.CompanyId.HasValue)
             {
-                logger.LogDebug($"Company resolved by {workspaceResolver.Name}: {workspaceResolveContext.WorkspaceId}");
+                logger.LogDebug($"Company resolved by {companyResolver.Name}: {companyResolveContext.CompanyId}");
                 break;
             }
         }
-        if (workspaceResolveContext.WorkspaceId.HasValue)
+        if (companyResolveContext.CompanyId.HasValue)
         {
             // Set current Company using scoped ICurrentWorkspace service 
-            using (currentWorkspace.Change(workspaceResolveContext.WorkspaceId.Value, workspaceResolveContext.WorkspaceName))
+            using (currentCompany.Change(companyResolveContext.CompanyId.Value, companyResolveContext.CompanyName))
             {
                 await next(context);
             }

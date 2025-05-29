@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Cyberjuice.Companies;
 
-public interface IWorkspaceResolveContext
+public interface ICompanyResolveContext
 {
-    Guid? WorkspaceId { get; set; }
+    Guid? CompanyId { get; set; }
 
-    string WorkspaceName { get; set; }
+    string CompanyName { get; set; }
 
     IServiceProvider ServiceProvider { get; }
 

@@ -6,11 +6,11 @@
     'use strict';
 
     const CONFIG = window.WORKSPACE_CONSTANTS || {
-        STORAGE_KEY: 'selectedWorkspaceId',
+        STORAGE_KEY: 'selectedCompanyId',
         HEADER_NAME: 'X-Company-Id'
     };
 
-    function getWorkspaceId() {
+    function getCompanyId() {
         return localStorage.getItem(CONFIG.STORAGE_KEY);
     }
 
@@ -18,7 +18,7 @@
         if (!window.jQuery) return;
 
         jQuery(document).ajaxSend(function (event, xhr, settings) {
-            const workspaceId = getWorkspaceId();
+            const workspaceId = getCompanyId();
 
             if (workspaceId) {
                 xhr.setRequestHeader(CONFIG.HEADER_NAME, workspaceId);

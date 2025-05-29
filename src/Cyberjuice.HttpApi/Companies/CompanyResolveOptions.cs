@@ -4,15 +4,15 @@ namespace Cyberjuice.Companies;
 
 public class CompanyResolveOptions
 {
-    public List<ICompanyResolveContributor> WorkspaceResolvers { get; }
+    public List<ICompanyResolveContributor> CompanyResolvers { get; }
 
     public CompanyResolveOptions()
     {
-        WorkspaceResolvers = [];
+        CompanyResolvers = [];
     }
 
     public void AddResolver(ICompanyResolveContributor resolver)
     {
-        WorkspaceResolvers.Add(resolver);
+        CompanyResolvers.Add(resolver);
     }
 }

@@ -9,6 +9,6 @@ namespace Cyberjuice.Companies
     public interface ICompanyResolveContributor
     {
         string Name { get; }
-        Task ResolveAsync(IWorkspaceResolveContext context);
+        Task ResolveAsync(ICompanyResolveContext context);
     }
 }

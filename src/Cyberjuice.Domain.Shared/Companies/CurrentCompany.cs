@@ -38,15 +38,15 @@ public class CurrentCompany : ICurrentCompany, ISingletonDependency
     /// <returns>A disposable object to restore Company values when disposed.</returns>
     public virtual IDisposable Change(Guid? id, string name)
     {
-        var workspaceCacheItem = _currentCompanyCacheItem.Value;
-        var previousWorkspaceId = workspaceCacheItem?.CompanyId;
-        var previousCopanyName = workspaceCacheItem?.Name;
-        if (id == previousWorkspaceId && name == previousCopanyName)
+        var companyCacheItem = _currentCompanyCacheItem.Value;
+        var previousCompanyId = companyCacheItem?.CompanyId;
+        var previousCopanyName = companyCacheItem?.Name;
+        if (id == previousCompanyId && name == previousCopanyName)
         {
             return NullCompanyRestore.Instance;
         }
         _currentCompanyCacheItem.Value = new CompanyCacheItem(id, name);
-        return new CompanyRestore(this, previousWorkspaceId, previousCopanyName);
+        return new CompanyRestore(this, previousCompanyId, previousCopanyName);
     }
     private class CompanyCacheItem
     {
@@ -62,16 +62,16 @@ public class CurrentCompany : ICurrentCompany, ISingletonDependency
     {
         private readonly CurrentCompany _currentCompany;
         private readonly Guid? _copmanyId;
-        private readonly string _workspaceName;
-        public CompanyRestore(CurrentCompany currentCompany, Guid? companyId, string workspaceName = null)
+        private readonly string _companyName;
+        public CompanyRestore(CurrentCompany currentCompany, Guid? companyId, string companyName = null)
         {
             _currentCompany = currentCompany;
             _copmanyId = companyId;
-            _workspaceName = workspaceName;
+            _companyName = companyName;
         }
         public void Dispose()
         {
-            _currentCompany._currentCompanyCacheItem.Value = new CompanyCacheItem(_copmanyId, _workspaceName);
+            _currentCompany._currentCompanyCacheItem.Value = new CompanyCacheItem(_copmanyId, _companyName);
         }
     }
     private class NullCompanyRestore : IDisposable

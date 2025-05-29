@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace Cyberjuice.Companies
 {
-    public class WorkspaceResolveContext : IWorkspaceResolveContext
+    public class CompanyResolveContext : ICompanyResolveContext
     {
-        public Guid? WorkspaceId { get; set; }
-        public string WorkspaceName { get; set; }
+        public Guid? CompanyId { get; set; }
+        public string CompanyName { get; set; }
 
         public IServiceProvider ServiceProvider => _httpContext.RequestServices;
 
         private readonly HttpContext _httpContext;
-        public WorkspaceResolveContext(HttpContext httpContext)
+        public CompanyResolveContext(HttpContext httpContext)
         {
             _httpContext = httpContext;
         }

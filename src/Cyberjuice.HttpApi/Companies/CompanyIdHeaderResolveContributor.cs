@@ -16,9 +16,9 @@ public class CompanyIdHeaderResolveContributor : ICompanyResolveContributor, ITr
     public const string HeaderName = "X-Company-Id";
 
     /// <summary>
-    /// Default contributor name: WorkspaceIdHeader.
+    /// Default contributor name: CompanyIdHeader.
     /// </summary>
-    public const string ContributorName = "WorkspaceIdHeader";
+    public const string ContributorName = "CompanyIdHeader";
     /// <summary>
     /// Name of the contributor.
     /// </summary>
@@ -31,7 +31,7 @@ public class CompanyIdHeaderResolveContributor : ICompanyResolveContributor, ITr
     /// <summary>
     /// Tries to resolve current Company from HTTP header.
     /// </summary>
-    public Task ResolveAsync(IWorkspaceResolveContext context)
+    public Task ResolveAsync(ICompanyResolveContext context)
     {
         var httpContext = context.GetHttpContext();
         if (httpContext == null)
@@ -46,7 +46,7 @@ public class CompanyIdHeaderResolveContributor : ICompanyResolveContributor, ITr
         if (Guid.TryParse(WorkspaceIdHeader[0], out var workspaceId))
         {
             _logger.LogDebug($"Company Id found in request header: {workspaceId}");
-            context.WorkspaceId = workspaceId;
+            context.CompanyId = workspaceId;
         }
         else
         {
