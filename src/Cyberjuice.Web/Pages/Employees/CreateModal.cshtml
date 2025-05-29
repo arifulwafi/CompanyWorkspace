@@ -15,23 +15,24 @@
         <abp-modal-body>
             <div class="row">
                 <div class="col-md-6">
-                    <abp-input asp-for="Employee.FirstName" />
+                    <abp-input asp-for="ViewModel.FirstName" />
                 </div>
                 <div class="col-md-6">
-                    <abp-input asp-for="Employee.LastName" />
+                    <abp-input asp-for="ViewModel.LastName" />
                 </div>
             </div>
-            <abp-input asp-for="Employee.Email" />
-            <abp-input asp-for="Employee.PhoneNumber" />
+            <abp-input asp-for="ViewModel.UserName" />
+            <abp-input asp-for="ViewModel.Email" />
+            <abp-input asp-for="ViewModel.PhoneNumber" />
             <div class="row">
                 <div class="col-md-6">
-                    <abp-input asp-for="Employee.DateOfBirth" type="date" />
+                    <abp-input asp-for="ViewModel.DateOfBirth" type="date" />
                 </div>
                 <div class="col-md-6">
-                    <abp-input asp-for="Employee.JoiningDate" type="date" />
+                    <abp-input asp-for="ViewModel.JoiningDate" type="date" />
                 </div>
             </div>
-            <abp-input asp-for="Employee.TotalLeaveDays" />
+            <abp-input asp-for="ViewModel.TotalLeaveDays" />
 
             @if (Model.Companies.Count != 0)
             {
@@ -42,7 +43,7 @@
                         {
                             <div class="form-check form-check-inline me-3">
                                 <input type="checkbox"
-                                       name="Employee.CompanyIds"
+                                       name="ViewModel.CompanyIds"
                                        value="@Model.Companies[i].Value"
                                        class="form-check-input"
                                        id="company_@i" />
@@ -52,7 +53,7 @@
                             </div>
                         }
                     </div>
-                    <span class="text-danger field-validation-valid" data-valmsg-for="Employee.CompanyIds" data-valmsg-replace="true"></span>
+                    <span class="text-danger field-validation-valid" data-valmsg-for="ViewModel.CompanyIds" data-valmsg-replace="true"></span>
                 </div>
             }
 

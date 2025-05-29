@@ -1,19 +1,24 @@
 using Cyberjuice.Employees.Dtos;
 using Cyberjuice.Permissions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.Identity;
 
 namespace Cyberjuice.Employees;
 
 public class EmployeeAppService(
+    IdentityUserManager identityUserManager,
+    IRepository<IdentityRole> identityRoles,
     IRepository<Employee, Guid> employeeRepository,
     EmployeeManager employeeManager)
     : ApplicationService, IEmployeeAppService
@@ -111,9 +116,41 @@ public class EmployeeAppService(
             input.CompanyIds
         );
 
+        await CreateAbpUserAsync(input, employee.Id);
+
         await employeeRepository.InsertAsync(employee, autoSave: true);
 
         return true;
+    }
+
+    private async Task CreateAbpUserAsync(CreateUpdateEmployeeInput employee, Guid id)
+    {
+        var user = new IdentityUser(
+            id: id,
+            userName: employee.UserName,
+            email: employee.Email
+        );
+
+        var defaultPass = "1q2w3E*";
+
+        (await identityUserManager.CreateAsync(user, defaultPass)).CheckErrors();
+
+        (await identityUserManager.SetLockoutEnabledAsync(user, false)).CheckErrors();
+
+        var defaultRoleList = await (await identityRoles.GetQueryableAsync())
+                                        .Where(x => x.IsDefault == true)
+                                        .Select(x => x.Name).ToListAsync();
+
+        if (defaultRoleList.Count == 0)
+        {
+            throw new UserFriendlyException(L["Set a role as default first."]);
+        }
+
+        (await identityUserManager.SetRolesAsync(user, defaultRoleList)).CheckErrors();
+
+        user.SetIsActive(true);
+        (await identityUserManager.UpdateAsync(user)).CheckErrors();
+
     }
 
     [Authorize(CyberjuicePermissions.Employees.Edit)]

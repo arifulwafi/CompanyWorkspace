@@ -1,12 +1,14 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AutoMapper;
+using Cyberjuice.Companies;
 using Cyberjuice.Employees;
 using Cyberjuice.Employees.Dtos;
-using Cyberjuice.Companies;
-using Cyberjuice.Companies.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.AspNetCore.Mvc.UI.RazorPages;
 
@@ -15,7 +17,7 @@ namespace Cyberjuice.Web.Pages.Employees;
 public class CreateModalModel : AbpPageModel
 {
     [BindProperty]
-    public CreateUpdateEmployeeInput Employee { get; set; }
+    public CreateEmployeeModel ViewModel { get; set; }
 
     public List<SelectListItem> Companies { get; set; } = new List<SelectListItem>();
 
@@ -30,24 +32,60 @@ public class CreateModalModel : AbpPageModel
 
     public async Task OnGetAsync()
     {
-        Employee = new CreateUpdateEmployeeInput();
+        ViewModel = new();
         await LoadCompaniesAsync();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await _employeeAppService.CreateAsync(Employee);
+        var createInput = ObjectMapper.Map<CreateEmployeeModel, CreateUpdateEmployeeInput>(ViewModel);
+
+        await _employeeAppService.CreateAsync(createInput);
         return NoContent();
     }
 
     private async Task LoadCompaniesAsync()
     {
         var companies = await _companyAppService.GetAllAsync(new PagedAndSortedResultRequestDto { MaxResultCount = 1000 });
-        
+
         Companies = companies.Items.Select(c => new SelectListItem
         {
             Value = c.Id.ToString(),
             Text = c.Name
         }).ToList();
     }
-} 
+
+    [AutoMap(typeof(CreateUpdateEmployeeInput), ReverseMap = true)]
+    public class CreateEmployeeModel
+    {
+        [Required]
+        public string FirstName { get; set; } = string.Empty;
+
+        [Required]
+        public string LastName { get; set; } = string.Empty;
+
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+
+        [Required]
+        public string PhoneNumber { get; set; } = string.Empty;
+
+        [Required]
+        public DateTime DateOfBirth { get; set; }
+
+        [Required]
+        public DateTime JoiningDate { get; set; }
+
+        [Range(0, 365)]
+        public int TotalLeaveDays { get; set; }
+
+        [Required]
+        [MinLength(1, ErrorMessage = "Employee must belong to at least one company")]
+        public List<Guid> CompanyIds { get; set; } = [];
+
+        [Required(ErrorMessage = "UserName is required.")]
+        [RegularExpression(@"^[a-zA-Z0-9]+$", ErrorMessage = "UserName can only contain letters and digits.")]
+        public string UserName { get; set; }
+    }
+}

@@ -31,4 +31,6 @@ public class CreateUpdateEmployeeInput
     [Required]
     [MinLength(1, ErrorMessage = "Employee must belong to at least one company")]
     public List<Guid> CompanyIds { get; set; } = new List<Guid>();
+
+    public string UserName { get; set; }
 }
