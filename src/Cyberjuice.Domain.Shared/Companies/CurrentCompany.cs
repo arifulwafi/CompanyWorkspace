@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 using Volo.Abp.DependencyInjection;
+using Volo.Abp.Users;
 
 namespace Cyberjuice.Companies;
 
@@ -21,6 +23,9 @@ public class CurrentCompany : ICurrentCompany, ISingletonDependency
     /// Gets a value indicates that current Company is available.
     /// </summary>
     public virtual bool IsAvailable => Id.HasValue;
+
+    public bool HasAccessToCurrentCompany => _currentCompanyCacheItem.Value == null ? false : _currentCompanyCacheItem.Value.HasAccessToCurrentCompany;
+
     /// <summary>
     /// Changes current Company Id.
     /// </summary>
@@ -28,7 +33,7 @@ public class CurrentCompany : ICurrentCompany, ISingletonDependency
     /// <returns>A disposable object to restore Company Id when disposed.</returns>
     public virtual IDisposable Change(Guid? id)
     {
-        return Change(id, null);
+        return Change(false, id, null);
     }
     /// <summary>
     /// Changes current Company Id and Name.
@@ -36,7 +41,7 @@ public class CurrentCompany : ICurrentCompany, ISingletonDependency
     /// <param name="id">Company Id</param>
     /// <param name="name">Company Name</param>
     /// <returns>A disposable object to restore Company values when disposed.</returns>
-    public virtual IDisposable Change(Guid? id, string name)
+    public virtual IDisposable Change(bool hasAccessToCurrentCompany, Guid? id, string name)
     {
         var companyCacheItem = _currentCompanyCacheItem.Value;
         var previousCompanyId = companyCacheItem?.CompanyId;
@@ -45,17 +50,19 @@ public class CurrentCompany : ICurrentCompany, ISingletonDependency
         {
             return NullCompanyRestore.Instance;
         }
-        _currentCompanyCacheItem.Value = new CompanyCacheItem(id, name);
+        _currentCompanyCacheItem.Value = new CompanyCacheItem(hasAccessToCurrentCompany, id, name);
         return new CompanyRestore(this, previousCompanyId, previousCopanyName);
     }
     private class CompanyCacheItem
     {
         public Guid? CompanyId { get; }
+        public bool HasAccessToCurrentCompany { get; }
         public string Name { get; }
-        public CompanyCacheItem(Guid? companyId, string name = null)
+        public CompanyCacheItem(bool hasAccessToCurrentCompany, Guid? companyId, string name = null)
         {
             CompanyId = companyId;
             Name = name;
+            HasAccessToCurrentCompany = hasAccessToCurrentCompany;
         }
     }
     private class CompanyRestore : IDisposable
@@ -63,6 +70,7 @@ public class CurrentCompany : ICurrentCompany, ISingletonDependency
         private readonly CurrentCompany _currentCompany;
         private readonly Guid? _copmanyId;
         private readonly string _companyName;
+        private readonly bool _hasAccessToCurrentCompany;
         public CompanyRestore(CurrentCompany currentCompany, Guid? companyId, string companyName = null)
         {
             _currentCompany = currentCompany;
@@ -71,7 +79,7 @@ public class CurrentCompany : ICurrentCompany, ISingletonDependency
         }
         public void Dispose()
         {
-            _currentCompany._currentCompanyCacheItem.Value = new CompanyCacheItem(_copmanyId, _companyName);
+            _currentCompany._currentCompanyCacheItem.Value = new CompanyCacheItem(_hasAccessToCurrentCompany, _copmanyId, _companyName);
         }
     }
     private class NullCompanyRestore : IDisposable

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Volo.Abp.EntityFrameworkCore;
+using Volo.Abp.Users;
 
 namespace Cyberjuice.Companies;
 
@@ -18,8 +19,10 @@ where TSelf : DbContext
     {
     }
 
-    protected ICurrentCompany CurrentCompany =>
-    LazyServiceProvider.LazyGetRequiredService<ICurrentCompany>();
+    protected ICurrentCompany CurrentCompany => LazyServiceProvider.LazyGetRequiredService<ICurrentCompany>();
+
+    protected ICurrentUser CurrentUser =>
+    LazyServiceProvider.LazyGetRequiredService<ICurrentUser>();
 
     protected ICompanyFilter MultiWorkspaceFilter =>
         LazyServiceProvider.LazyGetRequiredService<ICompanyFilter>();
@@ -88,6 +91,12 @@ where TSelf : DbContext
             .Entity<TEntity>()
             .Metadata
             .FindProperty(nameof(ICompany.CompanyId));
+
+        // Return no data if CurrentUserId is not available in CurrentCompany.Employees
+        if (IsMultiCompanyFilterEnabled && !CurrentCompany.HasAccessToCurrentCompany)
+        {
+            return _ => false;
+        }
 
         if (companyIdProperty is null)
         {

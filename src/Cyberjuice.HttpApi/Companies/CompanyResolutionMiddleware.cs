@@ -1,15 +1,19 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Cyberjuice.Employees;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 using Volo.Abp.DependencyInjection;
+using Volo.Abp.Domain.Repositories;
+using Volo.Abp.Users;
 
 namespace Cyberjuice.Companies;
 
 public class CompanyResolutionMiddleWare(
     IOptions<CompanyResolveOptions> options,
+    IEmployeeAppService employeeAppService,
     ILogger<CompanyResolutionMiddleWare> logger,
-    ICurrentCompany currentCompany) 
+    ICurrentCompany currentCompany)
     : IMiddleware, ITransientDependency
 {
     private readonly CompanyResolveOptions _options = options.Value;
@@ -30,8 +34,9 @@ public class CompanyResolutionMiddleWare(
         }
         if (companyResolveContext.CompanyId.HasValue)
         {
-            // Set current Company using scoped ICurrentWorkspace service 
-            using (currentCompany.Change(companyResolveContext.CompanyId.Value, companyResolveContext.CompanyName))
+            // Set current Company using scoped ICurrentWorkspace service
+            bool hasAccessTOCompany = await employeeAppService.GetEmployeeHasAccessToCompanyAsync(currentCompany.Id);
+            using (currentCompany.Change(hasAccessTOCompany, companyResolveContext.CompanyId.Value, companyResolveContext.CompanyName))
             {
                 await next(context);
             }

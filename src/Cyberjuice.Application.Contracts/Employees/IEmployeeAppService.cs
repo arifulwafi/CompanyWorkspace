@@ -15,4 +15,5 @@ public interface IEmployeeAppService : IApplicationService
     Task<bool> UpdateAsync(Guid id, CreateUpdateEmployeeInput input);
     Task DeleteAsync(Guid id);
     Task<PagedResultDto<EmployeeDto>> GetPagedListAsync(EmployeeFilter filter);
+    Task<bool> GetEmployeeHasAccessToCompanyAsync(Guid? id);
 }

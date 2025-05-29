@@ -13,23 +13,15 @@ using Volo.Abp.Domain.Repositories;
 
 namespace Cyberjuice.Employees;
 
-public class EmployeeAppService : ApplicationService, IEmployeeAppService
+public class EmployeeAppService(
+    IRepository<Employee, Guid> employeeRepository,
+    EmployeeManager employeeManager)
+    : ApplicationService, IEmployeeAppService
 {
-    private readonly IRepository<Employee, Guid> _employeeRepository;
-    private readonly EmployeeManager _employeeManager;
-
-    public EmployeeAppService(
-        IRepository<Employee, Guid> employeeRepository,
-        EmployeeManager employeeManager)
-    {
-        _employeeRepository = employeeRepository;
-        _employeeManager = employeeManager;
-    }
-
     [Authorize(CyberjuicePermissions.Employees.Default)]
     public async Task<EmployeeDto> GetAsync(Guid id)
     {
-        var employeeQueryable = (await _employeeRepository.GetQueryableAsync()).AsNoTracking();
+        var employeeQueryable = (await employeeRepository.GetQueryableAsync()).AsNoTracking();
 
         var employeeDto = await employeeQueryable
             .Where(e => e.Id == id)
@@ -54,7 +46,7 @@ public class EmployeeAppService : ApplicationService, IEmployeeAppService
     [Authorize(CyberjuicePermissions.Employees.Default)]
     public async Task<List<EmployeeDto>> GetListAsync()
     {
-        var employees = await _employeeRepository.GetListAsync(includeDetails: true);
+        var employees = await employeeRepository.GetListAsync(includeDetails: true);
         var employeeDtos = ObjectMapper.Map<List<Employee>, List<EmployeeDto>>(employees);
 
         // Set company IDs from navigation property
@@ -72,7 +64,7 @@ public class EmployeeAppService : ApplicationService, IEmployeeAppService
     {
         string sortBy = !string.IsNullOrWhiteSpace(input.Sorting) ? input.Sorting : nameof(Employee.JoiningDate);
 
-        var queryable = (await _employeeRepository.GetQueryableAsync())
+        var queryable = (await employeeRepository.GetQueryableAsync())
             .Include(e => e.Companies)
             .AsNoTracking();
 
@@ -108,7 +100,7 @@ public class EmployeeAppService : ApplicationService, IEmployeeAppService
     [Authorize(CyberjuicePermissions.Employees.Create)]
     public async Task<bool> CreateAsync(CreateUpdateEmployeeInput input)
     {
-        var employee = await _employeeManager.CreateAsync(
+        var employee = await employeeManager.CreateAsync(
             input.FirstName,
             input.LastName,
             input.Email,
@@ -119,19 +111,19 @@ public class EmployeeAppService : ApplicationService, IEmployeeAppService
             input.CompanyIds
         );
 
-        await _employeeRepository.InsertAsync(employee, autoSave: true);
-         
+        await employeeRepository.InsertAsync(employee, autoSave: true);
+
         return true;
     }
 
     [Authorize(CyberjuicePermissions.Employees.Edit)]
     public async Task<bool> UpdateAsync(Guid id, CreateUpdateEmployeeInput input)
     {
-        var employee = await (await _employeeRepository.GetQueryableAsync())
+        var employee = await (await employeeRepository.GetQueryableAsync())
                             .Include(e => e.Companies)
                             .SingleOrDefaultAsync(e => e.Id == id);
 
-        await _employeeManager.UpdateAsync(
+        await employeeManager.UpdateAsync(
             employee,
             input.FirstName,
             input.LastName,
@@ -150,6 +142,26 @@ public class EmployeeAppService : ApplicationService, IEmployeeAppService
     public async Task DeleteAsync(Guid id)
     {
         // CompanyEmployee entities will be automatically deleted due to cascade delete
-        await _employeeRepository.DeleteAsync(id);
+        await employeeRepository.DeleteAsync(id);
+    }
+
+    public async Task<bool> GetEmployeeHasAccessToCompanyAsync(Guid? currentCompanyId)
+    {
+        var employeeId = CurrentUser.Id;
+
+        if (employeeId is null || currentCompanyId is null)
+        {
+            return false; // No access if context is incomplete
+        }
+
+        var employeeQueryable = await employeeRepository.GetQueryableAsync();
+
+        var hasAccess = await employeeQueryable
+            .AsNoTracking()
+            .Where(e => e.Id == employeeId)
+            .SelectMany(e => e.Companies)
+            .AnyAsync(c => c.Id == currentCompanyId.Value);
+
+        return hasAccess;
     }
 }
