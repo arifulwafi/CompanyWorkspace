@@ -7,16 +7,16 @@ namespace Cyberjuice.Companies;
 
 public class CurrentCompany : ICurrentCompany, ISingletonDependency
 {
-    private readonly AsyncLocal<WorkspaceCacheItem> _currentWorkspaceCacheItem = new AsyncLocal<WorkspaceCacheItem>();
-    private readonly ConcurrentDictionary<string, WorkspaceCacheItem> _workspaceConfigurations = new ConcurrentDictionary<string, WorkspaceCacheItem>();
+    private readonly AsyncLocal<CompanyCacheItem> _currentCompanyCacheItem = new AsyncLocal<CompanyCacheItem>();
+    private readonly ConcurrentDictionary<string, CompanyCacheItem> _workspaceConfigurations = new ConcurrentDictionary<string, CompanyCacheItem>();
     /// <summary>
     /// Gets current Company's Id.
     /// </summary>
-    public virtual Guid? Id => _currentWorkspaceCacheItem.Value?.WorkspaceId;
+    public virtual Guid? Id => _currentCompanyCacheItem.Value?.CompanyId;
     /// <summary>
     /// Gets current Company's name.
     /// </summary>
-    public virtual string Name => _currentWorkspaceCacheItem.Value?.Name;
+    public virtual string Name => _currentCompanyCacheItem.Value?.Name;
     /// <summary>
     /// Gets a value indicates that current Company is available.
     /// </summary>
@@ -38,46 +38,46 @@ public class CurrentCompany : ICurrentCompany, ISingletonDependency
     /// <returns>A disposable object to restore Company values when disposed.</returns>
     public virtual IDisposable Change(Guid? id, string name)
     {
-        var workspaceCacheItem = _currentWorkspaceCacheItem.Value;
-        var previousWorkspaceId = workspaceCacheItem?.WorkspaceId;
-        var previousWorkspaceName = workspaceCacheItem?.Name;
-        if (id == previousWorkspaceId && name == previousWorkspaceName)
+        var workspaceCacheItem = _currentCompanyCacheItem.Value;
+        var previousWorkspaceId = workspaceCacheItem?.CompanyId;
+        var previousCopanyName = workspaceCacheItem?.Name;
+        if (id == previousWorkspaceId && name == previousCopanyName)
         {
-            return NullWorkspaceRestore.Instance;
+            return NullCompanyRestore.Instance;
         }
-        _currentWorkspaceCacheItem.Value = new WorkspaceCacheItem(id, name);
-        return new WorkspaceRestore(this, previousWorkspaceId, previousWorkspaceName);
+        _currentCompanyCacheItem.Value = new CompanyCacheItem(id, name);
+        return new CompanyRestore(this, previousWorkspaceId, previousCopanyName);
     }
-    private class WorkspaceCacheItem
+    private class CompanyCacheItem
     {
-        public Guid? WorkspaceId { get; }
+        public Guid? CompanyId { get; }
         public string Name { get; }
-        public WorkspaceCacheItem(Guid? workspaceId, string name = null)
+        public CompanyCacheItem(Guid? companyId, string name = null)
         {
-            WorkspaceId = workspaceId;
+            CompanyId = companyId;
             Name = name;
         }
     }
-    private class WorkspaceRestore : IDisposable
+    private class CompanyRestore : IDisposable
     {
-        private readonly CurrentCompany _currentWorkspace;
-        private readonly Guid? _workspaceId;
+        private readonly CurrentCompany _currentCompany;
+        private readonly Guid? _copmanyId;
         private readonly string _workspaceName;
-        public WorkspaceRestore(CurrentCompany currentWorkspace, Guid? workspaceId, string workspaceName = null)
+        public CompanyRestore(CurrentCompany currentCompany, Guid? companyId, string workspaceName = null)
         {
-            _currentWorkspace = currentWorkspace;
-            _workspaceId = workspaceId;
+            _currentCompany = currentCompany;
+            _copmanyId = companyId;
             _workspaceName = workspaceName;
         }
         public void Dispose()
         {
-            _currentWorkspace._currentWorkspaceCacheItem.Value = new WorkspaceCacheItem(_workspaceId, _workspaceName);
+            _currentCompany._currentCompanyCacheItem.Value = new CompanyCacheItem(_copmanyId, _workspaceName);
         }
     }
-    private class NullWorkspaceRestore : IDisposable
+    private class NullCompanyRestore : IDisposable
     {
-        public static readonly NullWorkspaceRestore Instance = new NullWorkspaceRestore();
-        private NullWorkspaceRestore()
+        public static readonly NullCompanyRestore Instance = new NullCompanyRestore();
+        private NullCompanyRestore()
         {
         }
         public void Dispose()

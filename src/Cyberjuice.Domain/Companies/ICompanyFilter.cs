@@ -16,7 +16,7 @@ public interface ICompanyFilter
     /// <summary>
     /// Gets a value indicating whether the Company filtering should be applied.
     /// </summary>
-    bool IsWorkspaceEnabled { get; }
+    bool IsCompanyEnabled { get; }
     /// <summary>
     /// Disables data filtering. Returns a disposable object to re-enable it later.
     /// </summary>

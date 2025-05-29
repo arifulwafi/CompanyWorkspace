@@ -298,7 +298,7 @@ public class CyberjuiceWebModule : AbpModule
         app.MapAbpStaticAssets();
         app.UseAbpStudioLink();
         app.UseRouting();
-        app.UseMiddleware<WorkspaceResolutionMiddleware>();
+        app.UseMiddleware<CompanyResolutionMiddleware>();
         app.UseAbpSecurityHeaders();
         app.UseAuthentication();
         app.UseAbpOpenIddictValidation();

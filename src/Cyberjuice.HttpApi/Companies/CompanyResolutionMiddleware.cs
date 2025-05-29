@@ -6,9 +6,9 @@ using Volo.Abp.DependencyInjection;
 
 namespace Cyberjuice.Companies;
 
-public class WorkspaceResolutionMiddleware(
+public class CompanyResolutionMiddleware(
     IOptions<CompanyResolveOptions> options,
-    ILogger<WorkspaceResolutionMiddleware> logger,
+    ILogger<CompanyResolutionMiddleware> logger,
     ICurrentCompany currentWorkspace) 
     : IMiddleware, ITransientDependency
 {

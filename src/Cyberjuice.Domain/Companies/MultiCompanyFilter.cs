@@ -17,7 +17,7 @@ public class MultiCompanyFilter(
     protected readonly IDataFilter DataFilter = DataFilter;
 
     public bool IsEnabled => DataFilter.IsEnabled<ICompany>();
-    public virtual bool IsWorkspaceEnabled => IsEnabled && CurrentWorkspace.Id.HasValue;
+    public virtual bool IsCompanyEnabled => IsEnabled && CurrentWorkspace.Id.HasValue;
     public IDisposable Disable()
     {
         return DataFilter.Disable<ICompany>();
@@ -30,7 +30,7 @@ public class MultiCompanyFilter(
     public IQueryable<TEntity> ApplyFilter<TEntity>(IQueryable<TEntity> query)
         where TEntity : class, ICompany
     {
-        if (!IsWorkspaceEnabled)
+        if (!IsCompanyEnabled)
         {
             return query;
         }
