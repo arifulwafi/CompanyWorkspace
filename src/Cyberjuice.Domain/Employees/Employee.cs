@@ -5,10 +5,8 @@ using Volo.Abp.MultiTenancy;
 
 namespace Cyberjuice.Employees;
 
-public class Employee : FullAuditedAggregateRoot<Guid>, ICompany
+public class Employee : FullAuditedAggregateRoot<Guid>
 {
-    public Guid? CompanyId { get; set; }
-
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string Email { get; set; }
