@@ -1,10 +1,8 @@
 using Cyberjuice.Companies;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Volo.Abp.Domain.Entities.Auditing;
-using Volo.Abp.MultiTenancy;
 using Volo.Abp;
+using Volo.Abp.Domain.Entities.Auditing;
 
 namespace Cyberjuice.Employees;
 
@@ -20,7 +18,7 @@ public class Employee : FullAuditedAggregateRoot<Guid>
     public int RemainingLeaveDays { get; set; }
 
     // Navigation property for many-to-many relationship
-    public virtual ICollection<CompanyEmployee> CompanyEmployees { get; set; } = [];
+    public virtual List<Company> Companies { get; set; } = [];
 
     protected Employee()
     {
@@ -46,7 +44,7 @@ public class Employee : FullAuditedAggregateRoot<Guid>
         JoiningDate = joiningDate;
         SetTotalLeaveDays(totalLeaveDays);
         RemainingLeaveDays = totalLeaveDays;
-        CompanyEmployees = [];
+        Companies = [];
     }
 
     public Employee SetFirstName(string firstName)
@@ -92,39 +90,14 @@ public class Employee : FullAuditedAggregateRoot<Guid>
         RemainingLeaveDays -= daysUsed;
     }
 
-    public void AddToCompany(Guid companyId)
-    {
-        if (CompanyEmployees.Any(ce => ce.CompanyId == companyId))
-        {
-            return; // Already exists
-        }
 
-        CompanyEmployees.Add(new CompanyEmployee(Id, companyId));
-    }
-
-    public void RemoveFromCompany(Guid companyId)
-    {
-        var companyEmployee = CompanyEmployees.FirstOrDefault(ce => ce.CompanyId == companyId);
-        if (companyEmployee != null)
-        {
-            CompanyEmployees.Remove(companyEmployee);
-        }
-    }
-
-    public void UpdateCompanies(IEnumerable<Guid> companyIds)
+    public void UpdateCompanies(IEnumerable<Company> companies)
     {
         // Clear existing company assignments
-        CompanyEmployees.Clear();
-        
+        Companies.Clear();
+
         // Add new company assignments
-        foreach (var companyId in companyIds)
-        {
-            CompanyEmployees.Add(new CompanyEmployee(Id, companyId));
-        }
+        Companies.AddRange(companies);
     }
 
-    public IEnumerable<Guid> GetCompanyIds()
-    {
-        return CompanyEmployees.Select(ce => ce.CompanyId);
-    }
 }

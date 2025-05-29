@@ -19,7 +19,7 @@ public class CyberjuiceApplicationAutoMapperProfile : Profile
         CreateMap<Employee, EmployeeDto>()
             .ForMember(dest => dest.CompanyIds, opt => opt.Ignore()); // Handled separately in the service
         CreateMap<CreateUpdateEmployeeInput, Employee>()
-            .ForMember(dest => dest.CompanyEmployees, opt => opt.Ignore()); // Handled separately
+            .ForMember(dest => dest.Companies, opt => opt.Ignore()); // Handled separately
         
         // Department mappings
         CreateMap<Department, DepartmentDto>();

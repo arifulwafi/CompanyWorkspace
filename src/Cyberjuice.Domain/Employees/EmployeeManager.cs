@@ -38,7 +38,8 @@ public class EmployeeManager(
         );
 
         // Add companies to employee
-        employee.UpdateCompanies(companyIds);
+        var companies = await companyRepository.GetListAsync(c => companyIds.Contains(c.Id));
+        employee.UpdateCompanies(companies);
 
         return employee;
     }
@@ -74,7 +75,8 @@ public class EmployeeManager(
         employee.JoiningDate = joiningDate;
 
         // Update company assignments
-        employee.UpdateCompanies(companyIds);
+        var companies = await companyRepository.GetListAsync(c => companyIds.Contains(c.Id));
+        employee.UpdateCompanies(companies);
 
         return employee;
     }

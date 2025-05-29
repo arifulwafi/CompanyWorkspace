@@ -8,10 +8,7 @@ public class CompanyEmployee : Entity
 {
     public Guid EmployeeId { get; set; }
     public Guid CompanyId { get; set; }
-
-    public virtual Employee Employee { get; set; }
-    public virtual Company Company { get; set; }
-
+    
     protected CompanyEmployee() {}
 
     public CompanyEmployee(Guid employeeId, Guid companyId)

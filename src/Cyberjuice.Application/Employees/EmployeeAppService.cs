@@ -33,7 +33,7 @@ public class EmployeeAppService : ApplicationService, IEmployeeAppService
         var employeeDto = ObjectMapper.Map<Employee, EmployeeDto>(employee);
 
         // Get company IDs from navigation property
-        employeeDto.CompanyIds = employee.CompanyEmployees.Select(ce => ce.CompanyId).ToList();
+        employeeDto.CompanyIds = employee.Companies.Select(ce => ce.Id).ToList();
 
         return employeeDto;
     }
@@ -48,7 +48,7 @@ public class EmployeeAppService : ApplicationService, IEmployeeAppService
         foreach (var dto in employeeDtos)
         {
             var employee = employees.First(e => e.Id == dto.Id);
-            dto.CompanyIds = [.. employee.CompanyEmployees.Select(ce => ce.CompanyId)];
+            dto.CompanyIds = [.. employee.Companies.Select(ce => ce.Id)];
         }
 
         return employeeDtos;
@@ -60,7 +60,7 @@ public class EmployeeAppService : ApplicationService, IEmployeeAppService
         string sortBy = !string.IsNullOrWhiteSpace(input.Sorting) ? input.Sorting : nameof(Employee.JoiningDate);
 
         var queryable = (await _employeeRepository.GetQueryableAsync())
-            .Include(e => e.CompanyEmployees)
+            .Include(e => e.Companies)
             .AsNoTracking();
 
         // Apply search filter
@@ -86,7 +86,7 @@ public class EmployeeAppService : ApplicationService, IEmployeeAppService
         foreach (var dto in employeeDtos)
         {
             var employee = employees.First(e => e.Id == dto.Id);
-            dto.CompanyIds = employee.CompanyEmployees.Select(ce => ce.CompanyId).ToList();
+            dto.CompanyIds = employee.Companies.Select(ce => ce.Id).ToList();
         }
 
         return new PagedResultDto<EmployeeDto>(totalCount, employeeDtos);
