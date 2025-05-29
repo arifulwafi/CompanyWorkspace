@@ -18,18 +18,18 @@ where TSelf : DbContext
     {
     }
 
-    protected ICurrentCompany CurrentWorkspace =>
+    protected ICurrentCompany CurrentCompany =>
     LazyServiceProvider.LazyGetRequiredService<ICurrentCompany>();
 
     protected ICompanyFilter MultiWorkspaceFilter =>
         LazyServiceProvider.LazyGetRequiredService<ICompanyFilter>();
 
-    protected bool IsMultiWorkspaceFilterEnabled =>
+    protected bool IsMultiCompanyFilterEnabled =>
         DataFilter?.IsEnabled<ICompany>() ?? false;
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
-        ApplyCurrentWorkspaceId();
+        ApplyCurrentCompanyId();
         return base.SaveChanges(acceptAllChangesOnSuccess);
     }
 
@@ -37,15 +37,15 @@ where TSelf : DbContext
         bool acceptAllChangesOnSuccess,
         CancellationToken cancellationToken = default)
     {
-        ApplyCurrentWorkspaceId();
+        ApplyCurrentCompanyId();
         return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
     }
 
-    private void ApplyCurrentWorkspaceId()
+    private void ApplyCurrentCompanyId()
     {
-        if (CurrentWorkspace?.Id == null) return;
+        if (CurrentCompany?.Id == null) return;
 
-        var currentWorkspaceId = CurrentWorkspace.Id.Value;
+        var currentWorkspaceId = CurrentCompany.Id.Value;
 
         foreach (var entry in ChangeTracker.Entries()
             .Where(e =>
@@ -90,9 +90,9 @@ where TSelf : DbContext
         var columnName = prop.GetColumnName() ?? prop.Name;
 
         Expression<Func<TEntity, bool>> workspaceFilter = e =>
-            !IsMultiWorkspaceFilterEnabled
-            || CurrentWorkspace.Id == null
-            || EF.Property<Guid?>(e, columnName) == CurrentWorkspace.Id;
+            !IsMultiCompanyFilterEnabled
+            || CurrentCompany.Id == null
+            || EF.Property<Guid?>(e, columnName) == CurrentCompany.Id;
 
         if (baseExpression == null) return workspaceFilter;
 
