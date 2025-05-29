@@ -45,6 +45,16 @@ public class CyberjuiceMenuContributor : IMenuContributor
             ).RequirePermissions(CyberjuicePermissions.Employees.Default)
         );
 
+        context.Menu.AddItem(
+        new ApplicationMenuItem(
+            CyberjuiceMenus.Departments,
+            l["Departments"],
+            url: "/Departments",
+            icon: "fa fa-users",
+            order: 2
+        ).RequirePermissions(CyberjuicePermissions.Departments.Default)
+    );
+
 
         //Administration
         var administration = context.Menu.GetAdministration();
