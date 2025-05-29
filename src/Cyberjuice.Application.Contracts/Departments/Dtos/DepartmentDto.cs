@@ -1,13 +1,11 @@
 using System;
 using Volo.Abp.Application.Dtos;
 
-namespace Cyberjuice.Departments.Dtos
+namespace Cyberjuice.Departments.Dtos;
+
+public class DepartmentDto : FullAuditedEntityDto<Guid>
 {
-    public class DepartmentDto : FullAuditedEntityDto<Guid>
-    {
-        public Guid? CompanyId { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public int EmployeeCount { get; set; }
-    }
-} 
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public int EmployeeCount { get; set; }
+}

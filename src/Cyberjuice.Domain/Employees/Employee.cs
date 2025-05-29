@@ -20,7 +20,7 @@ public class Employee : FullAuditedAggregateRoot<Guid>
     public int RemainingLeaveDays { get; set; }
 
     // Navigation property for many-to-many relationship
-    public virtual ICollection<CompanyEmployee> CompanyEmployees { get; set; } = new List<CompanyEmployee>();
+    public virtual ICollection<CompanyEmployee> CompanyEmployees { get; set; } = [];
 
     protected Employee()
     {
@@ -46,7 +46,7 @@ public class Employee : FullAuditedAggregateRoot<Guid>
         JoiningDate = joiningDate;
         SetTotalLeaveDays(totalLeaveDays);
         RemainingLeaveDays = totalLeaveDays;
-        CompanyEmployees = new List<CompanyEmployee>();
+        CompanyEmployees = [];
     }
 
     public Employee SetFirstName(string firstName)

@@ -1,13 +1,12 @@
+using Cyberjuice.Departments.Dtos;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Linq.Dynamic.Core;
+using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
-using System.Threading.Tasks;
-using System.Linq.Dynamic.Core;
-using System;
-using System.Linq;
-using Cyberjuice.Departments.Dtos;
-using Cyberjuice.Companies;
 
 namespace Cyberjuice.Departments;
 
@@ -15,16 +14,13 @@ public class DepartmentAppService : ApplicationService, IDepartmentAppService
 {
     private readonly IRepository<Department, Guid> _departmentRepository;
     private readonly DepartmentManager _departmentManager;
-    private readonly ICurrentCompany _currentCompany;
 
     public DepartmentAppService(
         IRepository<Department, Guid> departmentRepository,
-        DepartmentManager departmentManager,
-        ICurrentCompany currentCompany)
+        DepartmentManager departmentManager)
     {
         _departmentRepository = departmentRepository;
         _departmentManager = departmentManager;
-        _currentCompany = currentCompany;
     }
 
     public async Task<DepartmentDto> CreateAsync(CreateDepartmentDto input)
@@ -32,8 +28,7 @@ public class DepartmentAppService : ApplicationService, IDepartmentAppService
         var department = await _departmentManager.CreateAsync(
             input.Name,
             input.Description,
-            input.EmployeeCount,
-            _currentCompany.Id
+            input.EmployeeCount
         );
 
         var createdDepartment = await _departmentRepository.InsertAsync(department);
@@ -67,9 +62,7 @@ public class DepartmentAppService : ApplicationService, IDepartmentAppService
     {
         string sortBy = !string.IsNullOrWhiteSpace(input.Sorting) ? input.Sorting : nameof(Department.CreationTime);
 
-        var queryable = (await _departmentRepository.GetQueryableAsync())
-            .AsNoTracking()
-            .Where(d => d.CompanyId == _currentCompany.Id);
+        var queryable = (await _departmentRepository.GetQueryableAsync()).AsNoTracking();
 
         var totalCount = await queryable.CountAsync();
 
@@ -77,7 +70,6 @@ public class DepartmentAppService : ApplicationService, IDepartmentAppService
                     select new DepartmentDto
                     {
                         Id = d.Id,
-                        CompanyId = d.CompanyId,
                         Name = d.Name,
                         Description = d.Description,
                         EmployeeCount = d.EmployeeCount,

@@ -5,7 +5,7 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <RootNamespace>Cyberjuice</RootNamespace>
+    <RootNamespace>CyberJuice</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

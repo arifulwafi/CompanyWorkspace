@@ -1,16 +1,15 @@
+using Cyberjuice.Employees.Dtos;
+using Cyberjuice.Permissions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
-using System.Linq.Dynamic.Core;
-using Cyberjuice.Employees.Dtos;
-using Cyberjuice.Permissions;
-using Cyberjuice.Companies;
 
 namespace Cyberjuice.Employees;
 
@@ -18,16 +17,13 @@ public class EmployeeAppService : ApplicationService, IEmployeeAppService
 {
     private readonly IRepository<Employee, Guid> _employeeRepository;
     private readonly EmployeeManager _employeeManager;
-    private readonly ICurrentCompany _currentCompany;
 
     public EmployeeAppService(
         IRepository<Employee, Guid> employeeRepository,
-        EmployeeManager employeeManager,
-        ICurrentCompany currentCompany)
+        EmployeeManager employeeManager)
     {
         _employeeRepository = employeeRepository;
         _employeeManager = employeeManager;
-        _currentCompany = currentCompany;
     }
 
     [Authorize(CyberjuicePermissions.Employees.Default)]
@@ -35,10 +31,10 @@ public class EmployeeAppService : ApplicationService, IEmployeeAppService
     {
         var employee = await _employeeRepository.GetAsync(id, includeDetails: true);
         var employeeDto = ObjectMapper.Map<Employee, EmployeeDto>(employee);
-        
+
         // Get company IDs from navigation property
         employeeDto.CompanyIds = employee.CompanyEmployees.Select(ce => ce.CompanyId).ToList();
-        
+
         return employeeDto;
     }
 
@@ -52,7 +48,7 @@ public class EmployeeAppService : ApplicationService, IEmployeeAppService
         foreach (var dto in employeeDtos)
         {
             var employee = employees.First(e => e.Id == dto.Id);
-            dto.CompanyIds = employee.CompanyEmployees.Select(ce => ce.CompanyId).ToList();
+            dto.CompanyIds = [.. employee.CompanyEmployees.Select(ce => ce.CompanyId)];
         }
 
         return employeeDtos;
@@ -67,16 +63,10 @@ public class EmployeeAppService : ApplicationService, IEmployeeAppService
             .Include(e => e.CompanyEmployees)
             .AsNoTracking();
 
-        // Filter by current company if set
-        if (_currentCompany.Id.HasValue)
-        {
-            queryable = queryable.Where(e => e.CompanyEmployees.Any(ce => ce.CompanyId == _currentCompany.Id.Value));
-        }
-
         // Apply search filter
         if (!string.IsNullOrEmpty(input.Filter))
         {
-            queryable = queryable.Where(e => 
+            queryable = queryable.Where(e =>
                 e.FirstName.Contains(input.Filter) ||
                 e.LastName.Contains(input.Filter) ||
                 e.Email.Contains(input.Filter) ||
