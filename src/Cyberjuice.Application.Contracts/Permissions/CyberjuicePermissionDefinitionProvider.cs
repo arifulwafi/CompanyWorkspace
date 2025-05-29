@@ -20,6 +20,11 @@ public class CyberjuicePermissionDefinitionProvider : PermissionDefinitionProvid
         employeesPermission.AddChild(CyberjuicePermissions.Employees.Edit, L("Permission:Employees.Edit"));
         employeesPermission.AddChild(CyberjuicePermissions.Employees.Delete, L("Permission:Employees.Delete"));
 
+        // Departments permissions
+        var departmentsPermission = myGroup.AddPermission(CyberjuicePermissions.Departments.Default, L("Permission:Departments"));
+        departmentsPermission.AddChild(CyberjuicePermissions.Departments.Create, L("Permission:Departments.Create"));
+        departmentsPermission.AddChild(CyberjuicePermissions.Departments.Edit, L("Permission:Departments.Edit"));
+        departmentsPermission.AddChild(CyberjuicePermissions.Departments.Delete, L("Permission:Departments.Delete"));
     }
 
     private static LocalizableString L(string name)

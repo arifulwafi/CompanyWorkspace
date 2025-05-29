@@ -3,6 +3,7 @@ using Cyberjuice.Employees;
 using Cyberjuice.Employees.Dtos;
 using Cyberjuice.Departments;
 using Cyberjuice.Departments.Dtos;
+using System.Linq;
 
 namespace Cyberjuice;
 
@@ -13,8 +14,12 @@ public class CyberjuiceApplicationAutoMapperProfile : Profile
         /* You can configure your AutoMapper mapping configuration here.
          * Alternatively, you can split your mapping configurations
          * into multiple profile classes for a better organization. */
-        CreateMap<Employee, EmployeeDto>();
-        CreateMap<CreateUpdateEmployeeInput, Employee>();
+        
+        // Employee mappings
+        CreateMap<Employee, EmployeeDto>()
+            .ForMember(dest => dest.CompanyIds, opt => opt.Ignore()); // Handled separately in the service
+        CreateMap<CreateUpdateEmployeeInput, Employee>()
+            .ForMember(dest => dest.CompanyEmployees, opt => opt.Ignore()); // Handled separately
         
         // Department mappings
         CreateMap<Department, DepartmentDto>();

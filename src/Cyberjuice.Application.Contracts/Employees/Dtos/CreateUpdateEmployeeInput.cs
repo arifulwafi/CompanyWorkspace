@@ -1,14 +1,34 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Cyberjuice.Employees.Dtos;
 
 public class CreateUpdateEmployeeInput
 {
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
-    public string Email { get; set; }
-    public string PhoneNumber { get; set; }
+    [Required]
+    public string FirstName { get; set; } = string.Empty;
+
+    [Required]
+    public string LastName { get; set; } = string.Empty;
+
+    [Required]
+    [EmailAddress]
+    public string Email { get; set; } = string.Empty;
+
+    [Required]
+    public string PhoneNumber { get; set; } = string.Empty;
+
+    [Required]
     public DateTime DateOfBirth { get; set; }
+
+    [Required]
     public DateTime JoiningDate { get; set; }
+
+    [Range(0, 365)]
     public int TotalLeaveDays { get; set; }
+
+    [Required]
+    [MinLength(1, ErrorMessage = "Employee must belong to at least one company")]
+    public List<Guid> CompanyIds { get; set; } = new List<Guid>();
 }
