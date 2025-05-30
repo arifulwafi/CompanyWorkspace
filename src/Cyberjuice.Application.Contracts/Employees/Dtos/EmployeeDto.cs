@@ -11,8 +11,5 @@ public class EmployeeDto : FullAuditedEntityDto<Guid>
     public string Email { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
     public DateTime DateOfBirth { get; set; }
-    public DateTime JoiningDate { get; set; }
-    public int TotalLeaveDays { get; set; }
-    public int RemainingLeaveDays { get; set; }
-    public List<Guid> CompanyIds { get; set; } = new List<Guid>();
+    public List<Guid> CompanyIds { get; set; } = [];
 }

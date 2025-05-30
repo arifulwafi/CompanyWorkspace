@@ -38,9 +38,6 @@ public class EmployeeAppService(
                 Email = e.Email,
                 PhoneNumber = e.PhoneNumber,
                 DateOfBirth = e.DateOfBirth,
-                JoiningDate = e.JoiningDate,
-                TotalLeaveDays = e.TotalLeaveDays,
-                RemainingLeaveDays = e.RemainingLeaveDays,
                 CompanyIds = e.Companies.Select(c => c.Id).ToList()
             }).SingleOrDefaultAsync();
 
@@ -67,7 +64,7 @@ public class EmployeeAppService(
     [Authorize(CyberjuicePermissions.Employees.Default)]
     public async Task<PagedResultDto<EmployeeDto>> GetPagedListAsync(EmployeeFilter input)
     {
-        string sortBy = !string.IsNullOrWhiteSpace(input.Sorting) ? input.Sorting : nameof(Employee.JoiningDate);
+        string sortBy = !string.IsNullOrWhiteSpace(input.Sorting) ? input.Sorting : nameof(Employee.DateOfBirth);
 
         var queryable = (await employeeRepository.GetQueryableAsync())
             .Include(e => e.Companies)
@@ -111,8 +108,6 @@ public class EmployeeAppService(
             input.Email,
             input.PhoneNumber,
             input.DateOfBirth,
-            input.JoiningDate,
-            input.TotalLeaveDays,
             input.CompanyIds
         );
 
@@ -167,8 +162,6 @@ public class EmployeeAppService(
             input.Email,
             input.PhoneNumber,
             input.DateOfBirth,
-            input.JoiningDate,
-            input.TotalLeaveDays,
             input.CompanyIds
         );
 

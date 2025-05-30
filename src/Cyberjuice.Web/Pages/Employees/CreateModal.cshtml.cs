@@ -48,11 +48,11 @@ public class CreateModalModel : AbpPageModel
     {
         var companies = await _companyAppService.GetAllPagedAsync(new PagedAndSortedResultRequestDto { MaxResultCount = 1000 });
 
-        Companies = companies.Items.Select(c => new SelectListItem
+        Companies = [.. companies.Items.Select(c => new SelectListItem
         {
             Value = c.Id.ToString(),
             Text = c.Name
-        }).ToList();
+        })];
     }
 
     [AutoMap(typeof(CreateUpdateEmployeeInput), ReverseMap = true)]
@@ -73,12 +73,6 @@ public class CreateModalModel : AbpPageModel
 
         [Required]
         public DateTime DateOfBirth { get; set; }
-
-        [Required]
-        public DateTime JoiningDate { get; set; }
-
-        [Range(0, 365)]
-        public int TotalLeaveDays { get; set; }
 
         [Required]
         [MinLength(1, ErrorMessage = "Employee must belong to at least one company")]

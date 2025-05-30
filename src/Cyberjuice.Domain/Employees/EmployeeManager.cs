@@ -19,8 +19,6 @@ public class EmployeeManager(
         string email,
         string phoneNumber,
         DateTime dateOfBirth,
-        DateTime joiningDate,
-        int totalLeaveDays,
         IEnumerable<Guid> companyIds)
     {
         await CheckEmailNotExistsAsync(email);
@@ -32,10 +30,7 @@ public class EmployeeManager(
             lastName,
             email,
             phoneNumber,
-            dateOfBirth,
-            joiningDate,
-            totalLeaveDays
-        );
+            dateOfBirth);
 
         // Add companies to employee
         var companies = await companyRepository.GetListAsync(c => companyIds.Contains(c.Id));
@@ -51,8 +46,6 @@ public class EmployeeManager(
         string email,
         string phoneNumber,
         DateTime dateOfBirth,
-        DateTime joiningDate,
-        int totalLeaveDays,
         IEnumerable<Guid> companyIds)
     {
         Check.NotNull(employee, nameof(employee));
@@ -68,11 +61,9 @@ public class EmployeeManager(
             .SetFirstName(firstName)
             .SetLastName(lastName)
             .SetEmail(email)
-            .SetPhoneNumber(phoneNumber)
-            .SetTotalLeaveDays(totalLeaveDays);
+            .SetPhoneNumber(phoneNumber);
 
         employee.DateOfBirth = dateOfBirth;
-        employee.JoiningDate = joiningDate;
 
         // Update company assignments
         var companies = await companyRepository.GetListAsync(c => companyIds.Contains(c.Id));

@@ -34,21 +34,6 @@ $(function () {
                     }
                 },
                 {
-                    title: l('JoiningDate'),
-                    data: "joiningDate",
-                    render: function (data) {
-                        return luxon.DateTime.fromISO(data).toLocaleString();
-                    }
-                },
-                {
-                    title: l('TotalLeaveDays'),
-                    data: "totalLeaveDays"
-                },
-                {
-                    title: l('RemainingLeaveDays'),
-                    data: "remainingLeaveDays"
-                },
-                {
                     title: l('Actions'),
                     rowAction: {
                         items: [

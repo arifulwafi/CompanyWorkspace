@@ -22,7 +22,6 @@ public class EditModalModel : AbpPageModel
     [BindProperty]
     public CreateUpdateEmployeeInput Employee { get; set; }
     
-    public int RemainingLeaveDays { get; set; }
     public List<SelectListItem> Companies { get; set; } = new List<SelectListItem>();
 
     private readonly IEmployeeAppService _employeeAppService;
@@ -45,12 +44,9 @@ public class EditModalModel : AbpPageModel
             Email = employee.Email,
             PhoneNumber = employee.PhoneNumber,
             DateOfBirth = employee.DateOfBirth,
-            JoiningDate = employee.JoiningDate,
-            TotalLeaveDays = employee.TotalLeaveDays,
             CompanyIds = employee.CompanyIds
         };
         
-        RemainingLeaveDays = employee.RemainingLeaveDays;
         await LoadCompaniesAsync();
     }
 

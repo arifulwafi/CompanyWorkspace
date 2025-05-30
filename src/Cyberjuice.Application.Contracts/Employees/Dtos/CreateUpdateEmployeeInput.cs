@@ -22,11 +22,6 @@ public class CreateUpdateEmployeeInput
     [Required]
     public DateTime DateOfBirth { get; set; }
 
-    [Required]
-    public DateTime JoiningDate { get; set; }
-
-    [Range(0, 365)]
-    public int TotalLeaveDays { get; set; }
 
     [Required]
     [MinLength(1, ErrorMessage = "Employee must belong to at least one company")]

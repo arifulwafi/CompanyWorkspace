@@ -13,9 +13,6 @@ public class Employee : FullAuditedAggregateRoot<Guid>
     public string Email { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
     public DateTime DateOfBirth { get; set; }
-    public DateTime JoiningDate { get; set; }
-    public int TotalLeaveDays { get; set; }
-    public int RemainingLeaveDays { get; set; }
 
     // Navigation property for many-to-many relationship
     public virtual List<Company> Companies { get; set; } = [];
@@ -31,9 +28,7 @@ public class Employee : FullAuditedAggregateRoot<Guid>
         string lastName,
         string email,
         string phoneNumber,
-        DateTime dateOfBirth,
-        DateTime joiningDate,
-        int totalLeaveDays
+        DateTime dateOfBirth
     ) : base(id)
     {
         SetFirstName(firstName);
@@ -41,9 +36,6 @@ public class Employee : FullAuditedAggregateRoot<Guid>
         SetEmail(email);
         SetPhoneNumber(phoneNumber);
         DateOfBirth = dateOfBirth;
-        JoiningDate = joiningDate;
-        SetTotalLeaveDays(totalLeaveDays);
-        RemainingLeaveDays = totalLeaveDays;
         Companies = [];
     }
 
@@ -70,27 +62,7 @@ public class Employee : FullAuditedAggregateRoot<Guid>
         PhoneNumber = Check.NotNullOrWhiteSpace(phoneNumber, nameof(phoneNumber), EmployeeConsts.MaxPhoneNumberLength);
         return this;
     }
-
-    public Employee SetTotalLeaveDays(int totalLeaveDays)
-    {
-        if (totalLeaveDays < 0)
-        {
-            throw new ArgumentException("Total leave days cannot be negative.", nameof(totalLeaveDays));
-        }
-        TotalLeaveDays = totalLeaveDays;
-        return this;
-    }
-
-    public void UpdateRemainingLeaveDays(int daysUsed)
-    {
-        if (daysUsed > RemainingLeaveDays)
-        {
-            throw new BusinessException(CyberjuiceDomainErrorCodes.NotEnoughLeaveDays);
-        }
-        RemainingLeaveDays -= daysUsed;
-    }
-
-
+ 
     public void UpdateCompanies(IEnumerable<Company> companies)
     {
         // Clear existing company assignments
