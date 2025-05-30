@@ -13,6 +13,8 @@ using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.BlobStoring.Database.EntityFrameworkCore;
 using Volo.Abp.Studio;
+using Cyberjuice.Employees;
+using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 
 namespace Cyberjuice.EntityFrameworkCore;
 
@@ -43,6 +45,7 @@ public class CyberjuiceEntityFrameworkCoreModule : AbpModule
                 /* Remove "includeAllEntities: true" to create
                  * default repositories only for aggregate roots */
             options.AddDefaultRepositories(includeAllEntities: true);
+            options.AddRepository<CompanyEmployee, EfCoreRepository<CyberjuiceDbContext, CompanyEmployee>>();
         });
 
         if (AbpStudioAnalyzeHelper.IsInAnalyzeMode)

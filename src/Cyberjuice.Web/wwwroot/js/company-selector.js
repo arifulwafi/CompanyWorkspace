@@ -75,10 +75,10 @@
      * @param {jQuery} selectorElement - The Company selector element
      */
     function loadWorkspaces(selectorElement) {
-        cyberjuice.companies.company.getAll({})
+        cyberjuice.companies.company.getAll()
             .then(result => {
-                if (result?.items?.length) {
-                    populateOptions(selectorElement, result.items);
+                if (result?.length) {
+                    populateOptions(selectorElement, result);
                     restoreSavedSelection(selectorElement);
                     // Show Company name after workspaces are loaded
                     showWorkspaceName();

@@ -62,7 +62,7 @@ public class EditModalModel : AbpPageModel
 
     private async Task LoadCompaniesAsync()
     {
-        var companies = await _companyAppService.GetAllAsync(new PagedAndSortedResultRequestDto { MaxResultCount = 1000 });
+        var companies = await _companyAppService.GetAllPagedAsync(new PagedAndSortedResultRequestDto { MaxResultCount = 1000 });
         
         Companies = [.. companies.Items.Select(c => new SelectListItem
         {

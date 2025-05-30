@@ -9,7 +9,7 @@ $(function () {
             paging: true,
             searching: true,
             scrollX: true,
-            ajax: abp.libs.datatables.createAjax(cyberjuice.companies.company.getAll),
+            ajax: abp.libs.datatables.createAjax(cyberjuice.companies.company.getAllPaged),
             columnDefs: [
                 {
                     title: l('Name'),

@@ -7,10 +7,15 @@ using System.Linq.Dynamic.Core;
 using System;
 using System.Linq;
 using Cyberjuice.Companies.Dtos;
+using Cyberjuice.Employees;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Cyberjuice.Companies;
 
-public class CompanyAppService(IRepository<Company, Guid> companyRepository) 
+public class CompanyAppService(
+    IRepository<Company, Guid> companyRepository,
+    IRepository<CompanyEmployee> employeeCompanyRepo)
     : ApplicationService, ICompanyAppService
 {
     public async Task<CompanyDto> CreateAsync(string name)
@@ -36,9 +41,9 @@ public class CompanyAppService(IRepository<Company, Guid> companyRepository)
         var Company = await companyRepository.GetAsync(id);
         return new CompanyDto { Id = Company.Id, Name = Company.Name };
     }
- 
 
-    public async Task<PagedResultDto<CompanyDto>> GetAllAsync(PagedAndSortedResultRequestDto filter)
+
+    public async Task<PagedResultDto<CompanyDto>> GetAllPagedAsync(PagedAndSortedResultRequestDto filter)
     {
         string sortBy = !string.IsNullOrWhiteSpace(filter.Sorting) ? filter.Sorting : nameof(Company.CreationTime);
 
@@ -63,6 +68,26 @@ public class CompanyAppService(IRepository<Company, Guid> companyRepository)
             totalCount,
             result
         );
+    }
+
+    [Authorize]
+    public async Task<List<CompanyDto>> GetAllAsync()
+    {
+        var workspaceQueryable = (await companyRepository.GetQueryableAsync()).AsNoTracking();
+        var employeeCompanyQueryable = (await employeeCompanyRepo.GetQueryableAsync()).AsNoTracking();
+
+        var query = from company in workspaceQueryable
+                    join ec in employeeCompanyQueryable
+                        on company.Id equals ec.CompanyId
+                    where ec.EmployeeId == CurrentUser.Id
+                    select new CompanyDto
+                    {
+                        Id = company.Id,
+                        Name = company.Name,
+                        CreationTime = company.CreationTime
+                    };
+
+        return await query.ToListAsync();
     }
 
     public async Task DeleteAsync(Guid id) => await companyRepository.DeleteAsync(id);
