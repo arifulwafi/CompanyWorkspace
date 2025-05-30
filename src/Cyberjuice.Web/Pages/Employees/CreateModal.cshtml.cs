@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.AspNetCore.Mvc.UI.RazorPages;
+using Volo.Abp.Timing;
 
 namespace Cyberjuice.Web.Pages.Employees;
 
@@ -72,7 +73,7 @@ public class CreateModalModel : AbpPageModel
         public string PhoneNumber { get; set; } = string.Empty;
 
         [Required]
-        public DateTime DateOfBirth { get; set; }
+        public DateTime DateOfBirth { get; set; } = DateTime.Now;
 
         [Required]
         [MinLength(1, ErrorMessage = "Employee must belong to at least one company")]

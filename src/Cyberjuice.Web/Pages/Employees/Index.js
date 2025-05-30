@@ -7,7 +7,7 @@ $(function () {
         abp.libs.datatables.normalizeConfiguration({
             serverSide: true,
             paging: true,
-            searching: true,
+            searching: false,
             scrollX: true,
             ajax: abp.libs.datatables.createAjax(cyberjuice.employees.employee.getPagedList),
             columnDefs: [
